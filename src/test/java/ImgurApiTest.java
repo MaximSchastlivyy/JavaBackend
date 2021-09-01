@@ -2,9 +2,14 @@ import java.io.File;
 import java.io.IOException;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 
 import static io.restassured.RestAssured.*;
@@ -19,11 +24,40 @@ class ImgurApiTest extends BaseApiTest {
     public ImgurApiTest() throws IOException {
     }
 
+    RequestSpecification requestSpecification = null;
+    ResponseSpecification responseSpecification = null;
+    ResponseSpecification responseSpecificationWithBodyNotNullExpect = null;
+    ResponseSpecification responseSpecificationWithBodySuccessExpect = null;
+
     @BeforeEach
     void setUp() {
         RestAssured.baseURI = getBaseUri();
-    }
 
+        requestSpecification = new RequestSpecBuilder()
+                .setAuth(oauth2(getToken()))
+                .setAccept(ContentType.JSON)
+                .setContentType(ContentType.ANY)
+                .build();
+
+        responseSpecification = new ResponseSpecBuilder()
+                .expectStatusCode(200)
+                .expectStatusLine("HTTP/1.1 200 OK")
+                .expectContentType(ContentType.JSON)
+                .expectResponseTime(Matchers.lessThan(5000L))
+                .expectHeader("Access-Control-Allow-Credentials", "true")
+                .build();
+
+        responseSpecificationWithBodyNotNullExpect = new ResponseSpecBuilder()
+                .expectStatusCode(200)
+                .expectBody("data.id", is(notNullValue()))
+                .expectBody("data.deletehash", is(notNullValue()))
+                .build();
+
+        responseSpecificationWithBodyNotNullExpect = new ResponseSpecBuilder()
+                .expectStatusCode(200)
+                .expectBody("success", is(true))
+                .build();
+    }
 
     @AfterEach
     void tearDown() {
@@ -34,15 +68,12 @@ class ImgurApiTest extends BaseApiTest {
     void testGetAccountBase() {
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .expect()
                 .body("data.url", is("SchastlivyMax"))
                 .log()
                 .all()
-                .statusCode(200)
+                .spec(responseSpecification)
                 .when()
                 .get("3/account/{username}", getUserName());
     }
@@ -52,15 +83,12 @@ class ImgurApiTest extends BaseApiTest {
     void testImageUpload() throws Exception {
 
         currentDeleteHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
                 .expect()
-                .statusCode(200)
-                .body("data.id", is(notNullValue()))
-                .body("data.deletehash", is(notNullValue()))
+                .spec(responseSpecificationWithBodyNotNullExpect)
                 .log()
                 .all()
                 .when()
@@ -75,8 +103,7 @@ class ImgurApiTest extends BaseApiTest {
     void testNegativeImageUpload() throws Exception {
 
          given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .expect()
@@ -94,8 +121,7 @@ class ImgurApiTest extends BaseApiTest {
     void testGetImage() throws Exception {
 
         currentImageHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
@@ -105,16 +131,11 @@ class ImgurApiTest extends BaseApiTest {
                 .getString("data.id");
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .get("3/image/{ImageHash}", currentImageHash)
                 .then()
-                .statusCode(200)
-                .body("data.id", is(notNullValue()))
-                .body("data.deletehash", is(notNullValue()))
+                .spec(responseSpecificationWithBodyNotNullExpect)
                 .log()
                 .all()
                 .extract()
@@ -126,10 +147,7 @@ class ImgurApiTest extends BaseApiTest {
     void testGetImageNotFound() throws Exception {
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .get("3/image/{ImageHash}", "1111111")
                 .then()
@@ -143,10 +161,7 @@ class ImgurApiTest extends BaseApiTest {
     void testGetImageBadRequest() throws Exception {
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .get("3/image/")
                 .then()
@@ -160,8 +175,7 @@ class ImgurApiTest extends BaseApiTest {
     void testUpdateImage() throws Exception {
 
         currentDeleteHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
@@ -171,10 +185,7 @@ class ImgurApiTest extends BaseApiTest {
                 .getString("data.deletehash");
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("title","Heart")
@@ -194,8 +205,7 @@ class ImgurApiTest extends BaseApiTest {
     void testNegativeUpdateImage() throws Exception {
 
         currentDeleteHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
@@ -205,10 +215,7 @@ class ImgurApiTest extends BaseApiTest {
                 .getString("data.deletehash");
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("","")
@@ -228,8 +235,7 @@ class ImgurApiTest extends BaseApiTest {
     void testFavouriteImage() throws Exception {
 
         currentImageHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
@@ -239,15 +245,11 @@ class ImgurApiTest extends BaseApiTest {
                 .getString("data.id");
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .post("3/image/{imageHash}/favorite", currentImageHash)
                 .then()
-                .statusCode(200)
-                .body("success", is(true))
+                .spec(responseSpecificationWithBodySuccessExpect)
                 .log()
                 .all()
                 .extract()
@@ -260,10 +262,7 @@ class ImgurApiTest extends BaseApiTest {
 
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .post("3/image/{imageHash}/favorite", "0000000")
                 .then()
@@ -279,8 +278,7 @@ class ImgurApiTest extends BaseApiTest {
     void testFavouriteImageUnAuth() throws Exception {
 
         currentImageHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
@@ -305,8 +303,7 @@ class ImgurApiTest extends BaseApiTest {
     void testDeleteImage() throws Exception {
 
         currentDeleteHash = given()
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .header(new Header("content-type", "multipart/form-data"))
                 .multiPart("image", new File( "./src/main/resources/1.jpg"))
@@ -316,15 +313,11 @@ class ImgurApiTest extends BaseApiTest {
                 .getString("data.deletehash");
 
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .auth()
-                .oauth2(getToken())
+                .spec(requestSpecification)
                 .when()
                 .delete("3/image/{imageDeleteHash}", currentDeleteHash)
                 .then()
-                .statusCode(200)
-                .body("success", is(true))
+                .spec(responseSpecificationWithBodySuccessExpect)
                 .log()
                 .all()
                 .extract()
