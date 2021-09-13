@@ -229,7 +229,7 @@ class ImgurApiTest extends BaseApiTest {
                 .response();
     }
 
-
+    @Disabled
     @Test
     @DisplayName("Тест добавления картинки в избранное")
     void testFavouriteImage() throws Exception {
@@ -298,6 +298,7 @@ class ImgurApiTest extends BaseApiTest {
                 .response();
     }
 
+    @Disabled
     @Test
     @DisplayName("Тест удаления загруженной картинки")
     void testDeleteImage() throws Exception {
