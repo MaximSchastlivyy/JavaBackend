@@ -229,33 +229,6 @@ class ImgurApiTest extends BaseApiTest {
                 .response();
     }
 
-    @Disabled
-    @Test
-    @DisplayName("Тест добавления картинки в избранное")
-    void testFavouriteImage() throws Exception {
-
-        currentImageHash = given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("image", new File( "./src/main/resources/1.jpg"))
-                .when()
-                .post("3/upload")
-                .jsonPath()
-                .getString("data.id");
-
-        given()
-                .spec(requestSpecification)
-                .when()
-                .post("3/image/{imageHash}/favorite", currentImageHash)
-                .then()
-                .spec(responseSpecificationWithBodySuccessExpect)
-                .log()
-                .all()
-                .extract()
-                .response();
-    }
-
     @Test
     @DisplayName("Тест добавления несуществующей картинки в избранное")
     void testFavouriteImageNotFound() throws Exception {
@@ -292,33 +265,6 @@ class ImgurApiTest extends BaseApiTest {
                 .post("3/image/{imageHash}/favorite", currentImageHash)
                 .then()
                 .statusCode(401)
-                .log()
-                .all()
-                .extract()
-                .response();
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("Тест удаления загруженной картинки")
-    void testDeleteImage() throws Exception {
-
-        currentDeleteHash = given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("image", new File( "./src/main/resources/1.jpg"))
-                .when()
-                .post("3/upload")
-                .jsonPath()
-                .getString("data.deletehash");
-
-        given()
-                .spec(requestSpecification)
-                .when()
-                .delete("3/image/{imageDeleteHash}", currentDeleteHash)
-                .then()
-                .spec(responseSpecificationWithBodySuccessExpect)
                 .log()
                 .all()
                 .extract()
