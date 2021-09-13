@@ -1,0 +1,17 @@
+/home/maksim/JavaBackend/src/main/java/retrofit/api/MiniMarketApi.java
+/home/maksim/JavaBackend/src/main/java/db/dao/ProductParamsMapper.java
+/home/maksim/JavaBackend/src/main/java/retrofit/dto/ProductDto.java
+/home/maksim/JavaBackend/src/main/java/db/dao/CategoriesMapper.java
+/home/maksim/JavaBackend/src/main/java/retrofit/dto/Category.java
+/home/maksim/JavaBackend/src/main/java/db/model/Products.java
+/home/maksim/JavaBackend/src/main/java/Main.java
+/home/maksim/JavaBackend/src/main/java/PropertyScanner.java
+/home/maksim/JavaBackend/src/main/java/db/model/ProductsExample.java
+/home/maksim/JavaBackend/src/main/java/retrofit/Test.java
+/home/maksim/JavaBackend/src/main/java/db/model/Categories.java
+/home/maksim/JavaBackend/src/main/java/db/dao/ProductsMapper.java
+/home/maksim/JavaBackend/src/main/java/db/model/ProductParamsExample.java
+/home/maksim/JavaBackend/src/main/java/utils/PropertyScanner.java
+/home/maksim/JavaBackend/src/main/java/db/model/ProductParams.java
+/home/maksim/JavaBackend/src/main/java/retrofit/utils/RetrofitGetter.java
+/home/maksim/JavaBackend/src/main/java/db/model/CategoriesExample.java
