@@ -15,7 +15,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
 public class ApiTest {
 
