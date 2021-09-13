@@ -3,6 +3,7 @@ import java.util.List;
 
 import io.restassured.internal.common.assertion.Assertion;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
@@ -25,6 +26,7 @@ public class ApiTest {
         api = retrofit.create(MiniMarketApi.class);
     }
 
+    @Disabled
     @Test
     @DisplayName("Создание продукта")
     void testCreateProduct() throws IOException {
@@ -47,6 +49,7 @@ public class ApiTest {
         api.deleteProduct(id).execute();
     }
 
+    @Disabled
     @Test
     @DisplayName("Создание продукта с пустым id")
     void testCreateProductWithNullId() throws IOException {
@@ -63,6 +66,7 @@ public class ApiTest {
         new AssertionError("Id must be null for new entity");
     }
 
+    @Disabled
     @Test
     @DisplayName("Получение продукта")
     void testGetProduct() throws IOException {
@@ -85,6 +89,7 @@ public class ApiTest {
 
     }
 
+    @Disabled
     @Test
     @DisplayName("Получение продукта с несуществующим id")
     void testGetProductWithWrongId() throws IOException {
@@ -101,6 +106,7 @@ public class ApiTest {
         new AssertionError("Unable to find product with id: " + dto.getId());
     }
 
+    @Disabled
     @Test
     @DisplayName("Изменение продукта")
     void testUpdateProduct() throws IOException {
@@ -120,6 +126,7 @@ public class ApiTest {
         assertEquals(dto.getPrice(), actually.getPrice());
     }
 
+    @Disabled
     @Test
     @DisplayName("Изменение продукта со значением null в id")
     void testUpdateProductWithNullId() throws IOException {
@@ -135,6 +142,8 @@ public class ApiTest {
 
         new AssertionError("Id must be not null for new entity");
     }
+
+    @Disabled
     @Test
     @DisplayName("Изменение продукта с несуществующим id")
     void testUpdateProductWithWrongId() throws IOException {
@@ -151,6 +160,7 @@ public class ApiTest {
         new AssertionError("Product with id: \" + p.getId() + \" doesn't exist");
     }
 
+    @Disabled
     @Test
     @DisplayName("Удаление продукта")
     void testDeleteProduct() throws IOException {
