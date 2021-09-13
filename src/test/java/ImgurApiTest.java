@@ -79,26 +79,6 @@ class ImgurApiTest extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("Тест загрузки картинки")
-    void testImageUpload() throws Exception {
-
-        currentDeleteHash = given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("image", new File( "./src/main/resources/1.jpg"))
-                .expect()
-                .spec(responseSpecificationWithBodyNotNullExpect)
-                .log()
-                .all()
-                .when()
-                .post("3/upload")
-                .jsonPath()
-                .getString("data.deletehash");
-
-    }
-
-    @Test
     @DisplayName("Тест ошибки загрузки картинки")
     void testNegativeImageUpload() throws Exception {
 
@@ -114,32 +94,6 @@ class ImgurApiTest extends BaseApiTest {
                 .post("3/upload")
                 .jsonPath()
                 .getString("data.id");
-    }
-
-    @Test
-    @DisplayName("Тест получения загруженной картинки")
-    void testGetImage() throws Exception {
-
-        currentImageHash = given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("image", new File( "./src/main/resources/1.jpg"))
-                .when()
-                .post("3/upload")
-                .jsonPath()
-                .getString("data.id");
-
-        given()
-                .spec(requestSpecification)
-                .when()
-                .get("3/image/{ImageHash}", currentImageHash)
-                .then()
-                .spec(responseSpecificationWithBodyNotNullExpect)
-                .log()
-                .all()
-                .extract()
-                .response();
     }
 
     @Test
@@ -168,36 +122,6 @@ class ImgurApiTest extends BaseApiTest {
                 .statusCode(400)
                 .log()
                 .all();
-    }
-
-    @Test
-    @DisplayName("Тест обновления информации о загруженной картинки")
-    void testUpdateImage() throws Exception {
-
-        currentDeleteHash = given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("image", new File( "./src/main/resources/1.jpg"))
-                .when()
-                .post("3/upload")
-                .jsonPath()
-                .getString("data.deletehash");
-
-        given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("title","Heart")
-                .when()
-                .post("3/image/{imageDeleteHash}", currentDeleteHash)
-                .then()
-                .statusCode(200)
-                .body("success", is(true))
-                .log()
-                .all()
-                .extract()
-                .response();
     }
 
     @Test
@@ -240,31 +164,6 @@ class ImgurApiTest extends BaseApiTest {
                 .post("3/image/{imageHash}/favorite", "0000000")
                 .then()
                 .statusCode(404)
-                .log()
-                .all()
-                .extract()
-                .response();
-    }
-
-    @Test
-    @DisplayName("Тест добавления картинки в избранное неавторизированным пользователем")
-    void testFavouriteImageUnAuth() throws Exception {
-
-        currentImageHash = given()
-                .spec(requestSpecification)
-                .when()
-                .header(new Header("content-type", "multipart/form-data"))
-                .multiPart("image", new File( "./src/main/resources/1.jpg"))
-                .when()
-                .post("3/upload")
-                .jsonPath()
-                .getString("data.id");
-
-        given()
-                .when()
-                .post("3/image/{imageHash}/favorite", currentImageHash)
-                .then()
-                .statusCode(401)
                 .log()
                 .all()
                 .extract()
